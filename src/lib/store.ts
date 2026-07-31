@@ -78,7 +78,7 @@ export function useCartTotals() {
   const lines = useCart((s) => s.lines);
   const coupon = useCart((s) => s.coupon);
   const subtotal = lines.reduce((sum, l) => sum + l.price * l.qty, 0);
-  const discount = coupon ? Math.round(subtotal * COUPONS[coupon]) : 0;
+  const discount = coupon ? Math.round(subtotal * (COUPONS[coupon] ?? 0)) : 0;
   const taxed = subtotal - discount;
   const gst = Math.round(taxed * 0.05);
   const delivery = subtotal === 0 || subtotal >= 499 ? 0 : 40;
