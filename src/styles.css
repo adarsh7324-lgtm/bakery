@@ -169,10 +169,10 @@
 
 @utility bakery-pattern {
   background-image:
-    radial-gradient(circle at 12% 18%, color-mix(in oklab, var(--gold) 16%, transparent) 0 12px, transparent 13px),
-    radial-gradient(circle at 78% 62%, color-mix(in oklab, var(--caramel) 12%, transparent) 0 18px, transparent 19px),
-    radial-gradient(circle at 45% 88%, color-mix(in oklab, var(--caramel) 10%, transparent) 0 10px, transparent 11px);
-  background-size: 420px 420px;
+    radial-gradient(circle at 15% 20%, color-mix(in oklab, var(--gold) 7%, transparent) 0 90px, transparent 91px),
+    radial-gradient(circle at 85% 65%, color-mix(in oklab, var(--caramel) 6%, transparent) 0 130px, transparent 131px);
+  background-size: 1100px 1100px;
+  background-attachment: fixed;
 }
 
 @utility hover-lift {
