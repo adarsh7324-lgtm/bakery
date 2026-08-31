@@ -71,7 +71,7 @@ export function Footer() {
           </ul>
           <div className="mt-4 flex gap-2">
             {[
-              { icon: Instagram, label: "Instagram", href: "https://instagram.com" },
+              { icon: Instagram, label: "Instagram", href: "https://instagram.com/shreebakers" },
               { icon: Facebook, label: "Facebook", href: "https://facebook.com" },
               { icon: MessageCircle, label: "WhatsApp", href: "https://wa.me/917618000036" },
             ].map(({ icon: Icon, label, href }) => (

@@ -2,10 +2,26 @@ import chocolateCake from "@/assets/chocolate-cake.jpg";
 import blackForest from "@/assets/black-forest.jpg";
 import truffleCake from "@/assets/truffle-cake.jpg";
 import pizza from "@/assets/pizza.jpg";
+import pizzaPaneer from "@/assets/pizza-paneer.jpg";
+import pizzaVeggie from "@/assets/pizza-veggie.jpg";
 import burger from "@/assets/burger.jpg";
+import burgerAloo from "@/assets/burger-aloo.jpg";
+import burgerTandoori from "@/assets/burger-tandoori.jpg";
 import pastry from "@/assets/pastry.jpg";
+import pastryPineapple from "@/assets/pastry-pineapple.jpg";
+import pastryButterscotch from "@/assets/pastry-butterscotch.jpg";
 import quickbites from "@/assets/quickbites.jpg";
+import buns from "@/assets/buns.jpg";
+import pattice from "@/assets/pattice.jpg";
+import khari from "@/assets/khari.jpg";
+import hotdog from "@/assets/hotdog.jpg";
 import dessert from "@/assets/dessert.jpg";
+import chocoLava from "@/assets/choco-lava.jpg";
+import brownie from "@/assets/brownie.jpg";
+import cakePineapple from "@/assets/cake-pineapple.jpg";
+import cakeStrawberry from "@/assets/cake-strawberry.jpg";
+import cakeButterscotch from "@/assets/cake-butterscotch.jpg";
+import cakeRainbow from "@/assets/cake-rainbow.jpg";
 
 export type Category =
   | "Desserts"
@@ -31,13 +47,43 @@ const img: Record<string, string> = {
   blackForest,
   truffleCake,
   pizza,
+  pizzaPaneer,
+  pizzaVeggie,
   burger,
+  burgerAloo,
+  burgerTandoori,
   pastry,
+  pastryPineapple,
+  pastryButterscotch,
   quickbites,
+  buns,
+  pattice,
+  khari,
+  hotdog,
   dessert,
+  chocoLava,
+  brownie,
+  cakePineapple,
+  cakeStrawberry,
+  cakeButterscotch,
+  cakeRainbow,
 };
 
 export const images = img;
+
+/** Pick the best-matching cake photo for a flavour name. */
+function cakeImage(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes("black forest")) return blackForest;
+  if (n.includes("truffle")) return truffleCake;
+  if (n.includes("pineapple")) return cakePineapple;
+  if (n.includes("strawberry")) return cakeStrawberry;
+  if (n.includes("butterscotch")) return cakeButterscotch;
+  if (n.includes("rainbow")) return cakeRainbow;
+  if (n.includes("vanilla") || n.includes("white forest") || n.includes("fruit"))
+    return cakePineapple;
+  return chocolateCake;
+}
 
 export const menu: MenuItem[] = [
   // Desserts
@@ -47,7 +93,7 @@ export const menu: MenuItem[] = [
     description: "Molten chocolate cake with a warm gooey centre.",
     price: 80,
     category: "Desserts",
-    image: dessert,
+    image: chocoLava,
     popular: 88,
     badge: "Best Seller",
   },
@@ -57,7 +103,7 @@ export const menu: MenuItem[] = [
     description: "Fudgy cocoa brownie baked fresh every morning.",
     price: 70,
     category: "Desserts",
-    image: dessert,
+    image: brownie,
     popular: 74,
   },
 
@@ -68,7 +114,7 @@ export const menu: MenuItem[] = [
     description: "Creamy makhani sauce, paneer cubes and mozzarella.",
     price: 249,
     category: "Pizza",
-    image: pizza,
+    image: pizzaPaneer,
     popular: 82,
   },
   {
@@ -77,7 +123,7 @@ export const menu: MenuItem[] = [
     description: "Our signature loaded pizza with garden veggies and cheese.",
     price: 299,
     category: "Pizza",
-    image: pizza,
+    image: pizzaVeggie,
     popular: 90,
     badge: "Best Seller",
   },
@@ -98,7 +144,7 @@ export const menu: MenuItem[] = [
     description: "Crispy spiced potato patty with tangy sauces.",
     price: 60,
     category: "Burgers",
-    image: burger,
+    image: burgerAloo,
     popular: 70,
   },
   {
@@ -117,7 +163,7 @@ export const menu: MenuItem[] = [
     description: "Smoky tandoori patty with mint mayo and onions.",
     price: 99,
     category: "Burgers",
-    image: burger,
+    image: burgerTandoori,
     popular: 66,
   },
   {
@@ -126,7 +172,7 @@ export const menu: MenuItem[] = [
     description: "Rich makhni sauce, veg patty and melted cheese.",
     price: 99,
     category: "Burgers",
-    image: burger,
+    image: burgerTandoori,
     popular: 64,
     badge: "New",
   },
@@ -138,7 +184,7 @@ export const menu: MenuItem[] = [
     description: "Soft freshly baked buns, pack of four.",
     price: 30,
     category: "Quick Bites",
-    image: quickbites,
+    image: buns,
     popular: 40,
   },
   {
@@ -147,7 +193,7 @@ export const menu: MenuItem[] = [
     description: "Flaky puff pastry stuffed with spiced potato.",
     price: 25,
     category: "Quick Bites",
-    image: quickbites,
+    image: pattice,
     popular: 61,
   },
   {
@@ -156,7 +202,7 @@ export const menu: MenuItem[] = [
     description: "Golden puff filled with masala paneer.",
     price: 35,
     category: "Quick Bites",
-    image: quickbites,
+    image: pattice,
     popular: 58,
   },
   {
@@ -165,7 +211,7 @@ export const menu: MenuItem[] = [
     description: "Buttery cumin khari, perfect with chai.",
     price: 60,
     category: "Quick Bites",
-    image: quickbites,
+    image: khari,
     popular: 55,
   },
   {
@@ -174,7 +220,7 @@ export const menu: MenuItem[] = [
     description: "Soft ladi pav baked fresh daily.",
     price: 30,
     category: "Quick Bites",
-    image: quickbites,
+    image: buns,
     popular: 44,
   },
   {
@@ -183,7 +229,7 @@ export const menu: MenuItem[] = [
     description: "Long bun with veg sausage, cheese and herbs.",
     price: 80,
     category: "Quick Bites",
-    image: quickbites,
+    image: hotdog,
     popular: 52,
   },
 
@@ -216,11 +262,7 @@ export const menu: MenuItem[] = [
     description: String(description),
     price: Number(price),
     category: "Cakes" as Category,
-    image: String(name).toLowerCase().includes("black forest")
-      ? blackForest
-      : String(name).toLowerCase().includes("truffle")
-        ? truffleCake
-        : chocolateCake,
+    image: cakeImage(String(name)),
     popular: 60,
   })),
 
@@ -244,11 +286,7 @@ export const menu: MenuItem[] = [
     description: "Celebration size cake, freshly baked to order.",
     price: Number(price),
     category: "Cakes" as Category,
-    image: String(name).toLowerCase().includes("black forest")
-      ? blackForest
-      : String(name).toLowerCase().includes("truffle")
-        ? truffleCake
-        : chocolateCake,
+    image: cakeImage(String(name)),
     popular: 65,
   })),
 
@@ -278,7 +316,7 @@ export const menu: MenuItem[] = [
     description: "Moist pineapple pastry layered with whipped cream frosting.",
     price: 60,
     category: "Pastry",
-    image: pastry,
+    image: pastryPineapple,
     popular: 76,
   },
   {
@@ -287,7 +325,7 @@ export const menu: MenuItem[] = [
     description: "Butterscotch cream with caramel crunch topping.",
     price: 70,
     category: "Pastry",
-    image: pastry,
+    image: pastryButterscotch,
     popular: 73,
     badge: "20% OFF",
   },
