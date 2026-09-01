@@ -17,6 +17,7 @@ import { CartDrawer } from "@/components/cart-drawer";
 import { FloatingActions } from "@/components/floating-actions";
 import { Toaster } from "@/components/ui/sonner";
 import { Preloader } from "@/components/preloader";
+import { ChatWidget } from "@/components/chat-widget";
 
 function NotFoundComponent() {
   return (
@@ -144,6 +145,7 @@ function RootComponent() {
         <Footer />
         <CartDrawer />
         <FloatingActions />
+        <ChatWidget />
         <Toaster position="top-center" richColors />
       </div>
     </QueryClientProvider>
