@@ -11,7 +11,7 @@ import {
   Truck,
   Wheat,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import aboutImg from "@/assets/about.jpg";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
