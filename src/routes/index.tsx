@@ -12,7 +12,6 @@ import {
   Wheat,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import heroImg from "@/assets/hero.jpg";
 import aboutImg from "@/assets/about.jpg";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
@@ -39,31 +38,6 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
-  const [n, setN] = useState(0);
-
-  useEffect(() => {
-    if (!inView) return;
-    let frame = 0;
-    const total = 60;
-    const id = setInterval(() => {
-      frame += 1;
-      setN(Math.round(to * (1 - Math.pow(1 - frame / total, 3))));
-      if (frame >= total) clearInterval(id);
-    }, 16);
-    return () => clearInterval(id);
-  }, [inView, to]);
-
-  return (
-    <span ref={ref}>
-      {n.toLocaleString("en-IN")}
-      {suffix}
-    </span>
-  );
-}
-
 const features = [
   { icon: Croissant, title: "Freshly Baked", text: "Every batch baked the same morning it's sold." },
   { icon: Leaf, title: "Premium Ingredients", text: "Real butter, Belgian cocoa, seasonal fruit." },
@@ -82,82 +56,58 @@ function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-16 pt-12 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:pb-24 lg:pt-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
+      <section className="relative h-screen w-full overflow-hidden bg-black flex items-center justify-center">
+        {/* Cinematic Video Background */}
+        <video
+          src="/create_an_original_visual_conc.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        
+        {/* Subtle Dark Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/60 pointer-events-none" />
+
+        {/* Hero Content */}
+        <div className="relative z-10 flex flex-col items-center text-center px-4 w-full max-w-5xl mt-16">
+          <motion.h1
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ delay: 2.6, duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+            className="text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-[0.2em] font-serif uppercase drop-shadow-xl"
+            style={{ fontFamily: "'Playfair Display', serif" }}
           >
-            <span className="inline-flex items-center gap-2 rounded-full border border-caramel/30 bg-card px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-caramel">
-              <Wheat className="h-3.5 w-3.5" /> Lanka, Varanasi
-            </span>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.08] sm:text-5xl lg:text-6xl">
-              Freshly Baked <span className="text-gradient-warm">Happiness</span> Every Day
-            </h1>
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              From handcrafted cakes to cheesy pizzas and delightful pastries, Shree Bakers has
-              been serving Varanasi with love and freshness.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="rounded-full px-8 font-semibold">
-                <Link to="/menu">Order Now</Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="rounded-full border-caramel/40 px-8 font-semibold"
-              >
-                <Link to="/menu">Explore Menu</Link>
-              </Button>
-            </div>
+            Shree Bakers
+          </motion.h1>
 
-            <div className="mt-10 grid max-w-md grid-cols-3 gap-4">
-              {[
-                { n: 2250, s: "+", l: "Happy Customers" },
-                { n: 60, s: "+", l: "Menu Items" },
-                { n: 12, s: "+", l: "Years Baking" },
-              ].map((s) => (
-                <div key={s.l}>
-                  <p className="font-display text-2xl font-bold text-caramel sm:text-3xl">
-                    <Counter to={s.n} suffix={s.s} />
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">{s.l}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 3.2, duration: 1.2, ease: "easeOut" }}
+            className="text-zinc-200 mt-6 text-xs sm:text-sm md:text-base tracking-[0.3em] uppercase drop-shadow-md"
+          >
+            Freshly baked. Rooted in Varanasi.
+          </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="relative"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 3.8, duration: 1, ease: "easeOut" }}
+            className="mt-12 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center w-full sm:w-auto"
           >
-            <div className="overflow-hidden rounded-[2rem] shadow-lift">
-              <img
-                src={heroImg}
-                alt="Fresh cakes, croissants and pastries on a marble bakery counter"
-                width={1600}
-                height={1200}
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="absolute -bottom-6 left-4 rounded-3xl border border-border/70 bg-card/95 p-4 shadow-lift backdrop-blur sm:left-8"
+            <Button asChild size="lg" className="rounded-none bg-white text-black hover:bg-zinc-200 px-8 py-6 tracking-widest uppercase text-xs font-semibold w-full sm:w-auto">
+              <Link to="/menu">Explore Our Bakes</Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="rounded-none border-white/40 text-white hover:bg-white/10 px-8 py-6 tracking-widest uppercase text-xs font-semibold backdrop-blur-sm w-full sm:w-auto bg-black/20"
             >
-              <div className="flex items-center gap-1 text-gold">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-current" />
-                ))}
-              </div>
-              <p className="mt-1 font-display text-lg font-bold">4.3 Rating</p>
-              <p className="text-xs text-muted-foreground">2250+ Happy Customers</p>
-            </motion.div>
+              <Link to="/menu">Order Now</Link>
+            </Button>
           </motion.div>
         </div>
       </section>

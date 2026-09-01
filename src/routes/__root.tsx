@@ -16,6 +16,7 @@ import { Footer } from "@/components/footer";
 import { CartDrawer } from "@/components/cart-drawer";
 import { FloatingActions } from "@/components/floating-actions";
 import { Toaster } from "@/components/ui/sonner";
+import { Preloader } from "@/components/preloader";
 
 function NotFoundComponent() {
   return (
@@ -133,6 +134,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <Preloader />
       <div className="flex min-h-screen flex-col bakery-pattern">
         <Navbar />
         <main className="flex-1">
