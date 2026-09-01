@@ -66,10 +66,41 @@ function Checkout() {
       <SectionHeading eyebrow="Checkout" title="Almost there" />
 
       <form
-        onSubmit={handleSubmit(async () => {
-          await new Promise((r) => setTimeout(r, 700));
+        onSubmit={handleSubmit((data) => {
+          const itemsText = lines
+            .map((l, i) => `${i + 1}. *${l.name}* × ${l.qty} — ₹${l.price * l.qty}`)
+            .join("\n");
+
+          const paymentLabel =
+            data.payment === "cod"
+              ? "Cash on Delivery"
+              : data.payment === "upi"
+              ? "UPI"
+              : "Credit Card";
+
+          const message = `✨ *NEW ORDER - SHREE BAKERS* ✨
+
+👤 *Customer Details:*
+• *Name:* ${data.name}
+• *Phone:* ${data.phone}
+• *Address:* ${data.address}
+• *PIN Code:* ${data.pin}${data.landmark ? `\n• *Landmark:* ${data.landmark}` : ""}${data.notes ? `\n• *Notes:* ${data.notes}` : ""}
+• *Payment:* ${paymentLabel}
+
+🛒 *Order Items:*
+${itemsText}
+
+💰 *Payment Summary:*
+• Subtotal: ₹${subtotal}
+${discount > 0 ? `• Discount: -₹${discount}\n` : ""}• GST (5%): ₹${gst}
+• Delivery: ${delivery === 0 ? "Free" : `₹${delivery}`}
+• *Grand Total: ₹${total}*
+
+Thank you! Please confirm my order.`;
+
+          const whatsappUrl = `https://wa.me/917618000036?text=${encodeURIComponent(message)}`;
           clear();
-          navigate({ to: "/order-success" });
+          window.location.href = whatsappUrl;
         })}
         className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]"
       >
@@ -173,7 +204,7 @@ function Checkout() {
             disabled={isSubmitting}
             className="mt-6 w-full rounded-full font-semibold"
           >
-            {isSubmitting ? "Placing order..." : "Place Order"}
+            {isSubmitting ? "Redirecting..." : "Place Order on WhatsApp"}
           </Button>
         </aside>
       </form>
