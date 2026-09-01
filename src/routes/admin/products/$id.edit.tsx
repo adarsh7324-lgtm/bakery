@@ -4,7 +4,8 @@ import { ArrowLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { productService } from "@/services/productService";
-import { categories, type Category, type MenuItem } from "@/data/menu";
+import { type Category, type MenuItem } from "@/data/menu";
+import { useSettings } from "@/services/settingsService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/admin/products/$id/edit")({
 function EditProductPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const settings = useSettings();
 
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState<MenuItem | null>(null);
@@ -174,7 +176,7 @@ function EditProductPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
+                  {settings.categories.map((cat) => (
                     <SelectItem key={cat} value={cat}>
                       {cat}
                     </SelectItem>
@@ -203,10 +205,11 @@ function EditProductPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                <SelectItem value="Best Seller">Best Seller</SelectItem>
-                <SelectItem value="New">New</SelectItem>
-                <SelectItem value="20% OFF">20% OFF</SelectItem>
+                {settings.badges.map((b) => (
+                  <SelectItem key={b} value={b}>
+                    {b}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

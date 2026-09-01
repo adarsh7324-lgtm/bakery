@@ -8,6 +8,7 @@ import {
   Menu as MenuIcon,
   X,
   User,
+  Settings,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import logo from "@/assets/logo.png.asset.json";
@@ -36,6 +37,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/admin/products", label: "Products", icon: Package },
     { to: "/admin/products/new", label: "Add Product", icon: PlusCircle },
+    { to: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
   return (

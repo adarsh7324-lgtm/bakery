@@ -23,13 +23,7 @@ import cakeStrawberry from "@/assets/cake-strawberry.jpg";
 import cakeButterscotch from "@/assets/cake-butterscotch.jpg";
 import cakeRainbow from "@/assets/cake-rainbow.jpg";
 
-export type Category =
-  | "Desserts"
-  | "Pizza"
-  | "Burgers"
-  | "Quick Bites"
-  | "Cakes"
-  | "Pastry";
+export type Category = string;
 
 export type MenuItem = {
   id: string;

@@ -14,7 +14,8 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { useProducts, productService } from "@/services/productService";
-import { categories, inr, type Category, type MenuItem } from "@/data/menu";
+import { inr, type Category, type MenuItem } from "@/data/menu";
+import { useSettings } from "@/services/settingsService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -42,6 +43,7 @@ export const Route = createFileRoute("/admin/products/")({
 
 function AdminProductsPage() {
   const { products, loading } = useProducts();
+  const settings = useSettings();
   const navigate = useNavigate();
 
   // Search & Filters state
@@ -148,7 +150,7 @@ function AdminProductsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All Categories</SelectItem>
-              {categories.map((cat) => (
+              {settings.categories.map((cat) => (
                 <SelectItem key={cat} value={cat}>
                   {cat}
                 </SelectItem>
