@@ -1,8 +1,12 @@
-import { ArrowUp, MessageCircle, ShoppingBag } from "lucide-react";
+import { ArrowUp, ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart, useCartTotals } from "@/lib/store";
 
-export function FloatingActions() {
+interface FloatingActionsProps {
+  onChatOpen?: () => void;
+}
+
+export function FloatingActions({ onChatOpen }: FloatingActionsProps) {
   const [showTop, setShowTop] = useState(false);
   const setOpen = useCart((s) => s.setOpen);
   const { count } = useCartTotals();
@@ -25,20 +29,11 @@ export function FloatingActions() {
           <ArrowUp className="h-4 w-4" />
         </button>
       ) : null}
-      <a
-        href="https://wa.me/917618000036"
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Chat on WhatsApp"
-        className="grid h-12 w-12 place-items-center rounded-full bg-caramel text-accent-foreground shadow-lift transition hover:-translate-y-1"
-      >
-        <MessageCircle className="h-5 w-5" />
-      </a>
       <button
         type="button"
         aria-label="Open cart"
         onClick={() => setOpen(true)}
-        className="relative grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lift transition hover:-translate-y-1"
+        className="relative grid h-12 w-12 place-items-center rounded-full bg-primary text-primary-foreground shadow-lift transition hover:-translate-y-1"
       >
         <ShoppingBag className="h-5 w-5" />
         {count > 0 ? (

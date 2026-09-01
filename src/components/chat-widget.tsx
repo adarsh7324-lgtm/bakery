@@ -37,14 +37,14 @@ export function ChatWidget() {
         aria-label="Open FAQ help chat"
         onClick={() => setOpen(true)}
         className={cn(
-          "fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lift",
+          "fixed bottom-20 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-full shadow-lift",
           "bg-[#4a2910] text-white transition-all duration-300",
-          "hover:scale-110 hover:shadow-[0_8px_30px_rgba(74,41,16,0.45)]",
+          "hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(74,41,16,0.35)]",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4a2910]/60 focus-visible:ring-offset-2",
           open && "opacity-0 pointer-events-none scale-75",
         )}
       >
-        <MessageCircle className="h-6 w-6" strokeWidth={1.8} />
+        <MessageCircle className="h-5 w-5" strokeWidth={1.8} />
         {/* Ping dot */}
         <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-caramel border-2 border-white animate-ping" />
         <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-caramel border-2 border-white" />
@@ -56,7 +56,7 @@ export function ChatWidget() {
         aria-modal="true"
         aria-label="FAQ Help Assistant"
         className={cn(
-          "fixed bottom-6 right-6 z-50 w-[calc(100vw-3rem)] max-w-sm",
+          "fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] max-w-sm",
           "flex flex-col rounded-3xl border border-border/80 bg-card shadow-[0_20px_60px_rgba(0,0,0,0.18)]",
           "transition-all duration-300 origin-bottom-right",
           open
