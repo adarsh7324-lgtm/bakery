@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories, menu } from "@/data/menu";
+import { categories } from "@/data/menu";
+import { useProducts } from "@/services/productService";
 import { useCart } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/menu")({
 });
 
 function MenuPage() {
+  const { products } = useProducts();
   const [category, setCategory] = useState<string>("All");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("popular");
@@ -42,13 +44,13 @@ function MenuPage() {
 
   const suggestions = useMemo(() => {
     if (query.trim().length < 2) return [];
-    return menu
+    return products
       .filter((m) => m.name.toLowerCase().includes(query.toLowerCase()))
       .slice(0, 5);
-  }, [query]);
+  }, [query, products]);
 
   const items = useMemo(() => {
-    let list = menu.filter(
+    let list = products.filter(
       (m) =>
         (category === "All" || m.category === category) &&
         (m.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -60,10 +62,10 @@ function MenuPage() {
       return (b.popular ?? 0) - (a.popular ?? 0);
     });
     return list;
-  }, [category, query, sort]);
+  }, [category, query, sort, products]);
 
   const recentItems = recent
-    .map((id) => menu.find((m) => m.id === id))
+    .map((id) => products.find((m) => m.id === id))
     .filter(Boolean)
     .slice(0, 4);
 

@@ -40,7 +40,11 @@ export function ProductCard({
           height={675}
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
-        {item.badge ? (
+        {item.available === false ? (
+          <span className="absolute left-4 top-4 rounded-full bg-destructive text-destructive-foreground px-3 py-1 text-[11px] font-bold uppercase tracking-wider shadow-md">
+            Sold Out
+          </span>
+        ) : item.badge ? (
           <span
             className={cn(
               "absolute left-4 top-4 rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide",
@@ -93,13 +97,16 @@ export function ProductCard({
         </div>
         <Button
           className="w-full rounded-full font-semibold"
+          disabled={item.available === false}
           onClick={() => {
+            if (item.available === false) return;
             add(item, qty);
             view(item.id);
             toast.success(`${item.name} added to cart`);
           }}
         >
-          <ShoppingBag className="mr-2 h-4 w-4" /> Add to Cart
+          <ShoppingBag className="mr-2 h-4 w-4" />{" "}
+          {item.available === false ? "Sold Out" : "Add to Cart"}
         </Button>
       </div>
     </motion.article>

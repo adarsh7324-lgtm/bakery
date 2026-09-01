@@ -40,6 +40,8 @@ export type MenuItem = {
   image: string;
   popular?: number;
   badge?: "Best Seller" | "New" | "20% OFF";
+  available?: boolean;
+  featured?: boolean;
 };
 
 const img: Record<string, string> = {

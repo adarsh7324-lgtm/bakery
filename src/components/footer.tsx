@@ -123,8 +123,15 @@ export function Footer() {
           </p>
         </div>
       </div>
-      <div className="border-t border-border/70 px-4 py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Shree Bakers, Lanka, Varanasi. All rights reserved.
+      <div className="border-t border-border/70 px-4 py-6 text-center text-xs text-muted-foreground flex flex-col sm:flex-row items-center justify-between gap-3 max-w-7xl mx-auto">
+        <div>© {new Date().getFullYear()} Shree Bakers, Lanka, Varanasi. All rights reserved.</div>
+        <Link
+          to="/admin/login"
+          className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground/60 hover:text-caramel transition-colors"
+          title="Staff Portal"
+        >
+          <span>🔒 Staff Login</span>
+        </Link>
       </div>
     </footer>
   );

@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { Reveal, SectionHeading } from "@/components/reveal";
 import { Testimonials } from "@/components/testimonials";
-import { popularItems } from "@/data/menu";
+import { useProducts } from "@/services/productService";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -53,6 +53,12 @@ const story = [
 ];
 
 function Home() {
+  const { products } = useProducts();
+  const featuredItems = useMemo(() => {
+    const feat = products.filter((p) => p.featured);
+    return feat.length > 0 ? feat.slice(0, 6) : products.slice(0, 6);
+  }, [products]);
+
   return (
     <>
       {/* Hero */}
@@ -143,7 +149,7 @@ function Home() {
             subtitle="The classics Varanasi keeps coming back for."
           />
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {popularItems.map((item, i) => (
+            {featuredItems.map((item, i) => (
               <ProductCard key={item.id} item={item} index={i} />
             ))}
           </div>
