@@ -68,7 +68,7 @@ function Checkout() {
       <form
         onSubmit={handleSubmit((data) => {
           const itemsText = lines
-            .map((l, i) => `${i + 1}. *${l.name}* × ${l.qty} — ₹${l.price * l.qty}`)
+            .map((l, i) => `${i + 1}. *${l.name}* x ${l.qty} = Rs. ${l.price * l.qty}`)
             .join("\n");
 
           const paymentLabel =
@@ -78,23 +78,23 @@ function Checkout() {
               ? "UPI"
               : "Credit Card";
 
-          const message = `✨ *NEW ORDER - SHREE BAKERS* ✨
+          const message = `*NEW ORDER - SHREE BAKERS*
 
-👤 *Customer Details:*
-• *Name:* ${data.name}
-• *Phone:* ${data.phone}
-• *Address:* ${data.address}
-• *PIN Code:* ${data.pin}${data.landmark ? `\n• *Landmark:* ${data.landmark}` : ""}${data.notes ? `\n• *Notes:* ${data.notes}` : ""}
-• *Payment:* ${paymentLabel}
+*Customer Details:*
+- *Name:* ${data.name}
+- *Phone:* ${data.phone}
+- *Address:* ${data.address}
+- *PIN Code:* ${data.pin}${data.landmark ? `\n- *Landmark:* ${data.landmark}` : ""}${data.notes ? `\n- *Notes:* ${data.notes}` : ""}
+- *Payment Method:* ${paymentLabel}
 
-🛒 *Order Items:*
+*Order Items:*
 ${itemsText}
 
-💰 *Payment Summary:*
-• Subtotal: ₹${subtotal}
-${discount > 0 ? `• Discount: -₹${discount}\n` : ""}• GST (5%): ₹${gst}
-• Delivery: ${delivery === 0 ? "Free" : `₹${delivery}`}
-• *Grand Total: ₹${total}*
+*Payment Summary:*
+- Subtotal: Rs. ${subtotal}
+${discount > 0 ? `- Discount: -Rs. ${discount}\n` : ""}- GST (5%): Rs. ${gst}
+- Delivery: ${delivery === 0 ? "Free" : `Rs. ${delivery}`}
+- *Grand Total: Rs. ${total}*
 
 Thank you! Please confirm my order.`;
 
