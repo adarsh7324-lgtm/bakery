@@ -5,6 +5,7 @@
  */
 
 import { menu as initialSeedMenu, type MenuItem, type Category } from "@/data/menu";
+import { useEffect, useState } from "react";
 
 const PRODUCTS_STORAGE_KEY = "shree_bakers_products_v1";
 
@@ -135,8 +136,6 @@ export const productService = {
 };
 
 /** React hook for live product data across admin & customer pages */
-import { useEffect, useState } from "react";
-
 export function useProducts() {
   const [products, setProducts] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
