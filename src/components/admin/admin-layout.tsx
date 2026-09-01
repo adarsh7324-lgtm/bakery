@@ -11,7 +11,7 @@ import {
   Settings,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
-import logo from "@/assets/logo.png.asset.json";
+import logoUrl from "@/assets/logo.jpg";
 import { authService } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -45,7 +45,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
       {/* Mobile Top Navigation */}
       <header className="md:hidden flex items-center justify-between border-b border-border bg-card px-4 py-3 sticky top-0 z-30 shadow-sm">
         <div className="flex items-center gap-2.5">
-          <img src={logo.url} alt="Logo" className="h-9 w-9 rounded-full object-cover" />
+          <img src={logoUrl} alt="Logo" className="h-9 w-9 rounded-full object-cover" />
           <span className="font-display font-bold text-base text-foreground">
             Shree Admin
           </span>
@@ -116,7 +116,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-border/80 bg-card p-6 min-h-screen sticky top-0 shrink-0">
         <div className="flex items-center gap-3 pb-6 border-b border-border/70">
-          <img src={logo.url} alt="Shree Bakers logo" className="h-11 w-11 rounded-full object-cover" />
+          <img src={logoUrl} alt="Shree Bakers logo" className="h-11 w-11 rounded-full object-cover" />
           <div>
             <h2 className="font-display font-bold text-lg leading-tight">Shree Bakers</h2>
             <span className="text-[11px] font-semibold uppercase tracking-wider text-caramel">

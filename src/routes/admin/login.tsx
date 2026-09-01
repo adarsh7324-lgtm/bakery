@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
-import logo from "@/assets/logo.png.asset.json";
+import logoUrl from "@/assets/logo.jpg";
 import { authService, ADMIN_CONFIG } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,7 +58,7 @@ function AdminLogin() {
         {/* Brand & Header */}
         <div className="text-center">
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-secondary p-1 border border-border">
-            <img src={logo.url} alt="Shree Bakers logo" className="h-full w-full rounded-full object-cover" />
+            <img src={logoUrl} alt="Shree Bakers logo" className="h-full w-full rounded-full object-cover" />
           </div>
           <h1 className="mt-4 font-display text-2xl font-bold text-foreground">Admin Portal</h1>
           <p className="mt-1 text-sm text-muted-foreground">Manage your bakery website & products</p>

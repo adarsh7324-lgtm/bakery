@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { motion, useScroll, useSpring } from "motion/react";
 import { Menu, Moon, ShoppingBag, Sun, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import logo from "@/assets/logo.png.asset.json";
+import logoUrl from "@/assets/logo.jpg";
 import { Button } from "@/components/ui/button";
 import { useCart, useCartTotals } from "@/lib/store";
 
@@ -32,7 +32,7 @@ export function Navbar() {
         <nav className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-3">
             <img
-              src={logo.url}
+              src={logoUrl}
               alt="Shree Bakers logo"
               width={48}
               height={48}
