@@ -15,7 +15,7 @@ export const Route = createFileRoute("/admin/settings")({
 });
 
 function AdminSettingsPage() {
-  const settings = useSettings();
+  const { settings, loading } = useSettings();
   const [newCategory, setNewCategory] = useState("");
   const [newBadge, setNewBadge] = useState("");
 
@@ -29,15 +29,17 @@ function AdminSettingsPage() {
       return;
     }
 
-    settingsService.addCategory(trimmed);
-    toast.success(`Category "${trimmed}" added successfully`);
-    setNewCategory("");
+    settingsService.addCategory(trimmed).then(() => {
+      toast.success(`Category "${trimmed}" added successfully`);
+      setNewCategory("");
+    }).catch(() => toast.error("Failed to add category"));
   };
 
   const handleRemoveCategory = (category: string) => {
     if (window.confirm(`Are you sure you want to remove the category "${category}"?`)) {
-      settingsService.removeCategory(category);
-      toast.success(`Category "${category}" removed`);
+      settingsService.removeCategory(category)
+        .then(() => toast.success(`Category "${category}" removed`))
+        .catch(() => toast.error("Failed to remove category"));
     }
   };
 
@@ -51,9 +53,10 @@ function AdminSettingsPage() {
       return;
     }
 
-    settingsService.addBadge(trimmed);
-    toast.success(`Badge "${trimmed}" added successfully`);
-    setNewBadge("");
+    settingsService.addBadge(trimmed).then(() => {
+      toast.success(`Badge "${trimmed}" added successfully`);
+      setNewBadge("");
+    }).catch(() => toast.error("Failed to add badge"));
   };
 
   const handleRemoveBadge = (badge: string) => {
@@ -63,8 +66,9 @@ function AdminSettingsPage() {
     }
     
     if (window.confirm(`Are you sure you want to remove the badge "${badge}"?`)) {
-      settingsService.removeBadge(badge);
-      toast.success(`Badge "${badge}" removed`);
+      settingsService.removeBadge(badge)
+        .then(() => toast.success(`Badge "${badge}" removed`))
+        .catch(() => toast.error("Failed to remove badge"));
     }
   };
 
@@ -81,9 +85,12 @@ function AdminSettingsPage() {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-2 max-w-5xl">
-        {/* Categories Section */}
-        <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-soft space-y-6 flex flex-col">
+      {loading ? (
+        <div className="mt-16 text-center text-sm text-muted-foreground">Loading settings…</div>
+      ) : (
+        <div className="mt-8 grid gap-8 lg:grid-cols-2 max-w-5xl">
+          {/* Categories Section */}
+          <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-soft space-y-6 flex flex-col">
           <div className="flex items-center gap-3 border-b border-border/50 pb-4">
             <div className="grid h-10 w-10 place-items-center rounded-2xl border text-caramel bg-caramel/10 border-caramel/20">
               <Bookmark className="h-5 w-5" />
@@ -177,7 +184,8 @@ function AdminSettingsPage() {
             </ul>
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

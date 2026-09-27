@@ -28,35 +28,31 @@ export const Route = createFileRoute("/admin/products/new")({
 
 function AddProductPage() {
   const navigate = useNavigate();
-  const settings = useSettings();
+  const { settings } = useSettings();
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<Category>("Cakes");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState("");
   const [available, setAvailable] = useState(true);
   const [featured, setFeatured] = useState(false);
   const [badge, setBadge] = useState<string>("none");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Local image upload handler using FileReader / DataURL
+  // Upload image to Supabase Storage, preview locally
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!file.type.startsWith("image/")) {
       toast.error("Please upload a valid image file.");
       return;
     }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        setImageUrl(event.target.result as string);
-        toast.success("Image selected successfully.");
-      }
-    };
-    reader.readAsDataURL(file);
+    setImageFile(file);
+    // Show local preview via object URL
+    const preview = URL.createObjectURL(file);
+    setImageUrl(preview);
+    toast.success("Image selected. It will upload when you save.");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,13 +61,16 @@ function AddProductPage() {
     if (!price || isNaN(Number(price))) return toast.error("Please enter a valid price.");
     if (!description.trim()) return toast.error("Description is required.");
 
-    // Fallback default sample cake image if no upload provided
-    const finalImage =
-      imageUrl ||
-      "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=800";
-
     setIsSubmitting(true);
     try {
+      // Upload image to Supabase Storage if a file was selected
+      let finalImage = imageUrl;
+      if (imageFile) {
+        finalImage = await productService.uploadImage(imageFile);
+      } else if (!finalImage) {
+        finalImage = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=800";
+      }
+
       await productService.createProduct({
         name: name.trim(),
         price: Number(price),

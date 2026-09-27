@@ -43,7 +43,7 @@ export const Route = createFileRoute("/admin/products/")({
 
 function AdminProductsPage() {
   const { products, loading } = useProducts();
-  const settings = useSettings();
+  const { settings } = useSettings();
   const navigate = useNavigate();
 
   // Search & Filters state

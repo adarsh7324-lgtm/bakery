@@ -1,68 +1,63 @@
 /**
- * AuthService Abstraction
- * Local/Mock implementation for development & testing.
- * Designed to be replaced with Supabase Auth without altering UI components.
+ * AuthService – Supabase Auth implementation
+ * Uses Supabase email/password sign-in for admin authentication.
+ *
+ * To create the admin user, run once in Supabase SQL Editor:
+ *   select auth.create_user('admin@shreebakers.com', 'your-secure-password');
+ * Or use Supabase Dashboard → Authentication → Users → Add user.
  */
 
-const AUTH_STORAGE_KEY = "shree_bakers_admin_session";
+import { supabase } from "@/lib/supabase";
 
-// Isolated placeholder credentials
-export const ADMIN_CONFIG = {
-  email: "admin@shreebakers.com",
-  password: "admin",
-  name: "Shree Bakers Admin",
-};
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export type AdminUser = {
+  id: string;
   email: string;
-  name: string;
   loginAt: string;
 };
 
+// ─── Service ─────────────────────────────────────────────────────────────────
+
 export const authService = {
-  async login(email: string, pass: string): Promise<{ success: boolean; error?: string }> {
-    // Artificial slight delay for realistic UI loading state
-    await new Promise((res) => setTimeout(res, 600));
+  async login(
+    email: string,
+    pass: string
+  ): Promise<{ success: boolean; error?: string }> {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: pass,
+    });
 
-    if (email.trim().toLowerCase() === ADMIN_CONFIG.email.toLowerCase() && pass === ADMIN_CONFIG.password) {
-      const user: AdminUser = {
-        email: ADMIN_CONFIG.email,
-        name: ADMIN_CONFIG.name,
-        loginAt: new Date().toISOString(),
+    if (error) {
+      return {
+        success: false,
+        error: "Invalid email or password.",
       };
-      if (typeof window !== "undefined") {
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-      }
-      return { success: true };
     }
-
-    return { success: false, error: "Invalid Admin ID/Email or Password." };
+    return { success: true };
   },
 
   async logout(): Promise<void> {
-    await new Promise((res) => setTimeout(res, 200));
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-    }
+    await supabase.auth.signOut();
   },
 
-  isAuthenticated(): boolean {
-    if (typeof window === "undefined") return false;
-    try {
-      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      return Boolean(stored);
-    } catch {
-      return false;
-    }
+  async isAuthenticated(): Promise<boolean> {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    return session !== null;
   },
 
-  getCurrentUser(): AdminUser | null {
-    if (typeof window === "undefined") return null;
-    try {
-      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
+  async getCurrentUser(): Promise<AdminUser | null> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+    return {
+      id: user.id,
+      email: user.email ?? "",
+      loginAt: user.last_sign_in_at ?? new Date().toISOString(),
+    };
   },
 };

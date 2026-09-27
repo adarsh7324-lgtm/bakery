@@ -29,7 +29,7 @@ export const Route = createFileRoute("/admin/products/$id/edit")({
 function EditProductPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const settings = useSettings();
+  const { settings } = useSettings();
 
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState<MenuItem | null>(null);
@@ -39,6 +39,7 @@ function EditProductPage() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<Category>("Cakes");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState("");
   const [available, setAvailable] = useState(true);
   const [featured, setFeatured] = useState(false);
@@ -72,23 +73,19 @@ function EditProductPage() {
     };
   }, [id, navigate]);
 
+  // Upload image to Supabase Storage, preview locally
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!file.type.startsWith("image/")) {
       toast.error("Please upload a valid image file.");
       return;
     }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        setImageUrl(event.target.result as string);
-        toast.success("Image updated!");
-      }
-    };
-    reader.readAsDataURL(file);
+    setImageFile(file);
+    // Show local preview via object URL
+    const preview = URL.createObjectURL(file);
+    setImageUrl(preview);
+    toast.success("Image selected. It will upload when you save.");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,12 +96,17 @@ function EditProductPage() {
 
     setIsSubmitting(true);
     try {
+      let finalImage = imageUrl;
+      if (imageFile) {
+        finalImage = await productService.uploadImage(imageFile);
+      }
+
       await productService.updateProduct(id, {
         name: name.trim(),
         price: Number(price),
         description: description.trim(),
         category,
-        image: imageUrl,
+        image: finalImage,
         available,
         featured,
         badge: badge !== "none" ? (badge as any) : undefined,

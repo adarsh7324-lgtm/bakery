@@ -33,6 +33,7 @@ const TAGS = ["Cakes", "Pastries", "Pizza", "Bakery", "Store Interior"];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+// Helper: read file as base64 for local preview only
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -104,8 +105,9 @@ function PhotoCard({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 function AdminGalleryPage() {
-  const photos = useGalleryPhotos();
-  const owner = useOwnerDetails();
+  const { photos, loading: photosLoading } = useGalleryPhotos();
+  const { owner, loading: ownerLoading } = useOwnerDetails();
+  const loading = photosLoading || ownerLoading;
 
   // ── Owner form state ──
   const [ownerForm, setOwnerForm] = useState({
@@ -142,16 +144,23 @@ function AdminGalleryPage() {
   const handleOwnerPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Show local preview immediately
     const base64 = await fileToBase64(file);
     setOwnerPhotoPreview(base64);
-    setOwnerForm((prev) => ({ ...prev, photo: base64 }));
+    // Store file reference to upload on save
+    setOwnerForm((prev) => ({ ...prev, _photoFile: file } as typeof prev & { _photoFile: File }));
   };
 
   const handleOwnerSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setOwnerSaving(true);
     try {
-      galleryService.updateOwner(ownerForm);
+      let photoUrl = ownerForm.photo;
+      const formWithFile = ownerForm as typeof ownerForm & { _photoFile?: File };
+      if (formWithFile._photoFile) {
+        photoUrl = await galleryService.uploadOwnerPhoto(formWithFile._photoFile);
+      }
+      await galleryService.updateOwner({ ...ownerForm, photo: photoUrl });
       toast.success("Owner details saved successfully!");
     } catch {
       toast.error("Failed to save owner details");
@@ -167,9 +176,10 @@ function AdminGalleryPage() {
     setUploading(true);
     try {
       for (const file of files) {
-        const base64 = await fileToBase64(file);
-        galleryService.addPhoto({
-          src: base64,
+        // Upload to Supabase Storage and get public URL
+        const url = await galleryService.uploadGalleryImage(file);
+        await galleryService.addPhoto({
+          src: url,
           alt: file.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " "),
           tag: "Cakes",
         });
@@ -185,14 +195,25 @@ function AdminGalleryPage() {
 
   const handlePhotoDelete = (id: string) => {
     if (window.confirm("Remove this photo from the gallery?")) {
-      galleryService.deletePhoto(id);
-      toast.success("Photo removed");
+      galleryService.deletePhoto(id)
+        .then(() => toast.success("Photo removed"))
+        .catch(() => toast.error("Failed to remove photo"));
     }
   };
 
   const handlePhotoUpdate = (id: string, updates: Partial<Omit<GalleryPhoto, "id">>) => {
-    galleryService.updatePhoto(id, updates);
+    galleryService.updatePhoto(id, updates).catch(() => toast.error("Failed to update photo"));
   };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[40vh] text-sm text-muted-foreground">
+          Loading gallery…
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>

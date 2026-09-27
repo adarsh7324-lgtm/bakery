@@ -1,11 +1,19 @@
+/**
+ * SettingsService – Supabase implementation
+ * Reads/writes to the `public.app_settings` singleton-row table.
+ */
+
+import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 
-const SETTINGS_STORAGE_KEY = "shree_bakers_settings_v1";
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface AppSettings {
   categories: string[];
   badges: string[];
 }
+
+// ─── Defaults ────────────────────────────────────────────────────────────────
 
 const defaultSettings: AppSettings = {
   categories: [
@@ -22,33 +30,42 @@ const defaultSettings: AppSettings = {
   badges: ["none", "Best Seller", "New", "20% OFF"],
 };
 
+// ─── Listener System ─────────────────────────────────────────────────────────
+
 type SettingsListener = (settings: AppSettings) => void;
 const listeners: Set<SettingsListener> = new Set();
-
 function notifyListeners(settings: AppSettings) {
-  listeners.forEach((listener) => listener(settings));
+  listeners.forEach((fn) => fn(settings));
 }
 
-function initializeSettings(): AppSettings {
-  if (typeof window === "undefined") return defaultSettings;
-  try {
-    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return {
-        categories: Array.isArray(parsed.categories) ? parsed.categories : defaultSettings.categories,
-        badges: Array.isArray(parsed.badges) ? parsed.badges : defaultSettings.badges,
-      };
-    }
-  } catch (err) {
-    console.error("Failed to parse local settings", err);
-  }
+// ─── Internal helpers ─────────────────────────────────────────────────────────
 
-  if (typeof window !== "undefined") {
-    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(defaultSettings));
-  }
-  return defaultSettings;
+async function fetchSettings(): Promise<AppSettings> {
+  const { data, error } = await supabase
+    .from("app_settings")
+    .select("categories, badges")
+    .eq("singleton_id", true)
+    .single();
+  if (error || !data) return defaultSettings;
+  return {
+    categories: Array.isArray(data.categories)
+      ? data.categories
+      : defaultSettings.categories,
+    badges: Array.isArray(data.badges) ? data.badges : defaultSettings.badges,
+  };
 }
+
+async function saveSettings(settings: AppSettings): Promise<AppSettings> {
+  const { error } = await supabase
+    .from("app_settings")
+    .update({ categories: settings.categories, badges: settings.badges })
+    .eq("singleton_id", true);
+  if (error) throw error;
+  notifyListeners(settings);
+  return settings;
+}
+
+// ─── Service ─────────────────────────────────────────────────────────────────
 
 export const settingsService = {
   subscribe(listener: SettingsListener): () => void {
@@ -56,78 +73,62 @@ export const settingsService = {
     return () => listeners.delete(listener);
   },
 
-  getSettings(): AppSettings {
-    return initializeSettings();
+  async getSettings(): Promise<AppSettings> {
+    return fetchSettings();
   },
 
-  addCategory(category: string) {
-    const settings = this.getSettings();
+  async addCategory(category: string): Promise<AppSettings> {
+    const settings = await fetchSettings();
     if (settings.categories.includes(category)) return settings;
-    
-    const newSettings = { ...settings, categories: [...settings.categories, category] };
-    this._saveAndNotify(newSettings);
-    return newSettings;
-  },
-
-  removeCategory(category: string) {
-    const settings = this.getSettings();
-    const newSettings = { 
-      ...settings, 
-      categories: settings.categories.filter((c) => c !== category) 
+    const updated = {
+      ...settings,
+      categories: [...settings.categories, category],
     };
-    this._saveAndNotify(newSettings);
-    return newSettings;
+    return saveSettings(updated);
   },
 
-  addBadge(badge: string) {
-    const settings = this.getSettings();
+  async removeCategory(category: string): Promise<AppSettings> {
+    const settings = await fetchSettings();
+    const updated = {
+      ...settings,
+      categories: settings.categories.filter((c) => c !== category),
+    };
+    return saveSettings(updated);
+  },
+
+  async addBadge(badge: string): Promise<AppSettings> {
+    const settings = await fetchSettings();
     if (settings.badges.includes(badge)) return settings;
-    
-    const newSettings = { ...settings, badges: [...settings.badges, badge] };
-    this._saveAndNotify(newSettings);
-    return newSettings;
+    const updated = { ...settings, badges: [...settings.badges, badge] };
+    return saveSettings(updated);
   },
 
-  removeBadge(badge: string) {
-    const settings = this.getSettings();
-    const newSettings = { 
-      ...settings, 
-      badges: settings.badges.filter((b) => b !== badge) 
+  async removeBadge(badge: string): Promise<AppSettings> {
+    const settings = await fetchSettings();
+    const updated = {
+      ...settings,
+      badges: settings.badges.filter((b) => b !== badge),
     };
-    this._saveAndNotify(newSettings);
-    return newSettings;
+    return saveSettings(updated);
   },
-
-  _saveAndNotify(newSettings: AppSettings) {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(newSettings));
-    }
-    notifyListeners(newSettings);
-  }
 };
 
-/** React hook for live settings data */
+// ─── React Hook ───────────────────────────────────────────────────────────────
+
 export function useSettings() {
-  const [settings, setSettings] = useState<AppSettings>(initializeSettings());
+  const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
-    
-    if (isMounted) {
-      setSettings(settingsService.getSettings());
-    }
-
-    const unsubscribe = settingsService.subscribe((updatedSettings) => {
-      if (isMounted) {
-        setSettings(updatedSettings);
-      }
+    let mounted = true;
+    settingsService.getSettings().then((data) => {
+      if (mounted) { setSettings(data); setLoading(false); }
     });
-
-    return () => {
-      isMounted = false;
-      unsubscribe();
-    };
+    const unsub = settingsService.subscribe((updated) => {
+      if (mounted) setSettings(updated);
+    });
+    return () => { mounted = false; unsub(); };
   }, []);
 
-  return settings;
+  return { settings, loading };
 }

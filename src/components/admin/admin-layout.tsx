@@ -21,13 +21,22 @@ import { cn } from "@/lib/utils";
 export function AdminLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [user, setUser] = useState(authService.getCurrentUser());
+  const [user, setUser] = useState<{ id: string; email: string; loginAt: string } | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    if (!authService.isAuthenticated()) {
-      navigate({ to: "/admin/login" });
-    }
+    let mounted = true;
+    authService.isAuthenticated().then((authed) => {
+      if (!mounted) return;
+      if (!authed) {
+        navigate({ to: "/admin/login" });
+      } else {
+        authService.getCurrentUser().then((u) => {
+          if (mounted) setUser(u);
+        });
+      }
+    });
+    return () => { mounted = false; };
   }, [navigate]);
 
   const handleLogout = async () => {
@@ -168,7 +177,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                 {user.email.charAt(0).toUpperCase()}
               </div>
               <div className="truncate">
-                <p className="font-semibold text-foreground truncate">{user.name}</p>
+                <p className="font-semibold text-foreground truncate">Admin</p>
                 <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
               </div>
             </div>

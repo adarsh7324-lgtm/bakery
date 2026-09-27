@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
 import logoUrl from "@/assets/logo.jpg";
-import { authService, ADMIN_CONFIG } from "@/services/authService";
+import { authService } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -122,14 +122,13 @@ function AdminLogin() {
           </Button>
         </form>
 
-        {/* Local Demo Credentials Helper */}
+        {/* Supabase Auth Note */}
         <div className="mt-8 rounded-2xl bg-secondary/60 p-4 border border-border/60 text-xs text-muted-foreground space-y-1.5">
           <div className="flex items-center gap-1.5 font-semibold text-foreground">
             <ShieldCheck className="h-4 w-4 text-caramel" />
-            <span>Local Development Login Credentials:</span>
+            <span>Login with your Supabase admin account</span>
           </div>
-          <p className="font-mono text-[11px] text-foreground/80">Email: {ADMIN_CONFIG.email}</p>
-          <p className="font-mono text-[11px] text-foreground/80">Password: {ADMIN_CONFIG.password}</p>
+          <p className="text-[11px]">Create your admin user in Supabase Dashboard → Authentication → Users</p>
         </div>
       </div>
     </div>

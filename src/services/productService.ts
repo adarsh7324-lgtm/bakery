@@ -1,56 +1,100 @@
 /**
- * ProductService Abstraction
- * Local/Mock implementation for development & testing using localStorage with seed fallback.
- * Designed to be swapped with Supabase client (Supabase DB + Supabase Storage) seamlessly.
+ * ProductService – Supabase implementation
+ * Reads/writes to the `public.products` table.
+ * Image uploads go to the `product-images` storage bucket.
  */
 
-import { menu as initialSeedMenu, type MenuItem, type Category } from "@/data/menu";
+import { supabase } from "@/lib/supabase";
+import { menu as seedMenu, type MenuItem } from "@/data/menu";
 import { useEffect, useState } from "react";
 
-const PRODUCTS_STORAGE_KEY = "shree_bakers_products_v1";
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export type { MenuItem, Category } from "@/data/menu";
+export type CreateProductInput = Omit<MenuItem, "id"> & { id?: string };
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Convert a Supabase DB row → app MenuItem */
+function rowToItem(row: Record<string, unknown>): MenuItem {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    description: row.description as string,
+    price: row.price as number,
+    category: row.category as string,
+    image: row.image as string,
+    popular: row.popular as number,
+    badge: (row.badge as MenuItem["badge"]) ?? undefined,
+    available: row.available as boolean,
+    featured: row.featured as boolean,
+  };
+}
+
+/** Convert MenuItem → Supabase insert/update shape */
+function itemToRow(item: Partial<MenuItem>) {
+  return {
+    ...(item.id !== undefined && { id: item.id }),
+    ...(item.name !== undefined && { name: item.name }),
+    ...(item.description !== undefined && { description: item.description }),
+    ...(item.price !== undefined && { price: item.price }),
+    ...(item.category !== undefined && { category: item.category }),
+    ...(item.image !== undefined && { image: item.image }),
+    ...(item.popular !== undefined && { popular: item.popular }),
+    badge: item.badge ?? null,
+    ...(item.available !== undefined && { available: item.available }),
+    ...(item.featured !== undefined && { featured: item.featured }),
+  };
+}
+
+// ─── Listener System ─────────────────────────────────────────────────────────
 
 type ProductListener = (products: MenuItem[]) => void;
 const listeners: Set<ProductListener> = new Set();
-
 function notifyListeners(products: MenuItem[]) {
-  listeners.forEach((listener) => listener(products));
+  listeners.forEach((fn) => fn(products));
 }
 
-function initializeProducts(): MenuItem[] {
-  if (typeof window === "undefined") return initialSeedMenu;
-  try {
-    const stored = localStorage.getItem(PRODUCTS_STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
-      }
-    }
-  } catch (err) {
-    console.error("Failed to parse local products, resetting to seed", err);
-  }
+// ─── Seed helper ─────────────────────────────────────────────────────────────
 
-  // Ensure default available & featured flags on seed
-  const seeded = initialSeedMenu.map((item) => ({
-    ...item,
-    available: item.available ?? true,
-    featured: item.featured ?? [
-      "cake-500-chocolate-cake",
-      "cake-500-black-forest-cake",
-      "cake-500-chocolate-truffle-cake",
-      "veg-extra-cheese-pizza",
-      "cheese-burger",
-      "chocolate-pastry",
-    ].includes(item.id),
+let seeded = false;
+const FEATURED_IDS = [
+  "cake-500-chocolate-cake",
+  "cake-500-black-forest-cake",
+  "cake-500-chocolate-truffle-cake",
+  "veg-extra-cheese-pizza",
+  "cheese-burger",
+  "chocolate-pastry",
+];
+
+async function seedIfEmpty(): Promise<void> {
+  if (seeded) return;
+  seeded = true;
+  const { count } = await supabase
+    .from("products")
+    .select("id", { count: "exact", head: true });
+  if ((count ?? 0) > 0) return;
+
+  const rows = seedMenu.map((item) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    price: item.price,
+    category: item.category,
+    image: item.image,          // bundled asset path – stored as-is
+    popular: item.popular ?? 50,
+    badge: item.badge ?? null,
+    available: true,
+    featured: FEATURED_IDS.includes(item.id),
   }));
 
-  if (typeof window !== "undefined") {
-    localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(seeded));
+  // Insert in batches of 50 to stay under Supabase limits
+  for (let i = 0; i < rows.length; i += 50) {
+    await supabase.from("products").upsert(rows.slice(i, i + 50));
   }
-  return seeded;
 }
 
-export type CreateProductInput = Omit<MenuItem, "id"> & { id?: string };
+// ─── Service ─────────────────────────────────────────────────────────────────
 
 export const productService = {
   subscribe(listener: ProductListener): () => void {
@@ -59,67 +103,60 @@ export const productService = {
   },
 
   async getProducts(): Promise<MenuItem[]> {
-    return initializeProducts();
+    await seedIfEmpty();
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map(rowToItem);
   },
 
   async getProduct(id: string): Promise<MenuItem | undefined> {
-    const products = await this.getProducts();
-    return products.find((p) => p.id === id);
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", id)
+      .single();
+    if (error) return undefined;
+    return rowToItem(data);
   },
 
   async createProduct(input: CreateProductInput): Promise<MenuItem> {
-    const products = await this.getProducts();
-    const newProduct: MenuItem = {
-      id: input.id || `product-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-      name: input.name,
-      description: input.description,
-      price: input.price,
-      category: input.category,
-      image: input.image,
-      popular: input.popular ?? 50,
-      badge: input.badge,
-      available: input.available ?? true,
-      featured: input.featured ?? false,
-    };
-
-    const updated = [newProduct, ...products];
-    if (typeof window !== "undefined") {
-      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(updated));
-    }
-    notifyListeners(updated);
-    return newProduct;
+    const id =
+      input.id ||
+      `product-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    const { data, error } = await supabase
+      .from("products")
+      .insert({ ...itemToRow(input), id })
+      .select()
+      .single();
+    if (error) throw error;
+    const item = rowToItem(data);
+    const all = await this.getProducts();
+    notifyListeners(all);
+    return item;
   },
 
   async updateProduct(id: string, updates: Partial<MenuItem>): Promise<MenuItem> {
-    const products = await this.getProducts();
-    let updatedProduct: MenuItem | undefined;
-
-    const updatedList = products.map((p) => {
-      if (p.id === id) {
-        updatedProduct = { ...p, ...updates };
-        return updatedProduct;
-      }
-      return p;
-    });
-
-    if (!updatedProduct) {
-      throw new Error(`Product with ID ${id} not found.`);
-    }
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(updatedList));
-    }
-    notifyListeners(updatedList);
-    return updatedProduct;
+    const { data, error } = await supabase
+      .from("products")
+      .update(itemToRow(updates))
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) throw error;
+    const item = rowToItem(data);
+    const all = await this.getProducts();
+    notifyListeners(all);
+    return item;
   },
 
   async deleteProduct(id: string): Promise<void> {
-    const products = await this.getProducts();
-    const filtered = products.filter((p) => p.id !== id);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(filtered));
-    }
-    notifyListeners(filtered);
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (error) throw error;
+    const all = await this.getProducts();
+    notifyListeners(all);
   },
 
   async toggleAvailability(id: string): Promise<MenuItem> {
@@ -133,33 +170,43 @@ export const productService = {
     if (!product) throw new Error("Product not found");
     return this.updateProduct(id, { featured: !product.featured });
   },
+
+  /** Upload an image file to Supabase Storage and return its public URL */
+  async uploadImage(file: File): Promise<string> {
+    const ext = file.name.split(".").pop();
+    const path = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${ext}`;
+    const { error } = await supabase.storage
+      .from("product-images")
+      .upload(path, file, { upsert: false });
+    if (error) throw error;
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    return data.publicUrl;
+  },
 };
 
-/** React hook for live product data across admin & customer pages */
+// ─── React Hook ───────────────────────────────────────────────────────────────
+
 export function useProducts() {
   const [products, setProducts] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
-    productService.getProducts().then((data) => {
-      if (isMounted) {
-        setProducts(data);
-        setLoading(false);
-      }
-    });
+    let mounted = true;
+    productService
+      .getProducts()
+      .then((data) => {
+        if (mounted) { setProducts(data); setLoading(false); }
+      })
+      .catch((err) => {
+        if (mounted) { setError(String(err.message)); setLoading(false); }
+      });
 
-    const unsubscribe = productService.subscribe((updatedProducts) => {
-      if (isMounted) {
-        setProducts(updatedProducts);
-      }
+    const unsub = productService.subscribe((updated) => {
+      if (mounted) setProducts(updated);
     });
-
-    return () => {
-      isMounted = false;
-      unsubscribe();
-    };
+    return () => { mounted = false; unsub(); };
   }, []);
 
-  return { products, loading };
+  return { products, loading, error };
 }
