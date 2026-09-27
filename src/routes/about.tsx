@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChefHat, Heart, Timer, Wheat } from "lucide-react";
+import { ChefHat, Heart, Timer, Wheat, Phone, Mail, Quote } from "lucide-react";
 import aboutImg from "@/assets/about.jpg";
 import heroImg from "@/assets/hero.jpg";
+import ownerImgSrc from "@/assets/owner.jpg";
 import { Button } from "@/components/ui/button";
 import { Reveal, SectionHeading } from "@/components/reveal";
+import { useOwnerDetails } from "@/services/galleryService";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -32,6 +34,11 @@ const timeline = [
 ];
 
 function About() {
+  const owner = useOwnerDetails();
+
+  // Use the bundled owner image as fallback if no custom photo is set
+  const ownerPhoto = owner.photo || ownerImgSrc;
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
       <SectionHeading
@@ -82,6 +89,74 @@ function About() {
         </Reveal>
       </div>
 
+      {/* ── Owner Section ── */}
+      <Reveal className="mt-20">
+        <div className="relative overflow-hidden rounded-[2rem] border border-caramel/20 bg-gradient-to-br from-secondary/80 via-background to-caramel/5 p-8 sm:p-12 shadow-soft">
+          {/* Decorative quote mark */}
+          <Quote className="absolute right-8 top-8 h-24 w-24 text-caramel/10 rotate-180 pointer-events-none select-none" />
+
+          <div className="relative z-10 flex flex-col items-center gap-10 md:flex-row md:items-start">
+            {/* Owner photo */}
+            <div className="shrink-0 flex flex-col items-center gap-3">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-caramel to-caramel/40 blur-lg opacity-40 scale-110" />
+                <img
+                  src={ownerPhoto}
+                  alt={`${owner.name} — ${owner.title}`}
+                  className="relative h-44 w-44 rounded-full object-cover ring-4 ring-caramel/30 shadow-lift"
+                />
+              </div>
+              <div className="text-center">
+                <p className="font-display text-xl font-bold text-foreground">{owner.name}</p>
+                <p className="mt-0.5 text-xs font-semibold uppercase tracking-widest text-caramel">
+                  {owner.title}
+                </p>
+              </div>
+            </div>
+
+            {/* Owner bio & contact */}
+            <div className="flex flex-col justify-center gap-5 text-center md:text-left">
+              <div>
+                <span className="inline-block rounded-full bg-caramel/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-caramel border border-caramel/20 mb-4">
+                  Meet the Owner
+                </span>
+                <h2 className="font-display text-2xl font-bold sm:text-3xl text-foreground leading-tight">
+                  The Heart Behind the Bakery
+                </h2>
+              </div>
+              <p className="leading-relaxed text-muted-foreground text-sm sm:text-base max-w-xl">
+                {owner.bio}
+              </p>
+
+              {/* Contact info */}
+              {(owner.phone || owner.email) && (
+                <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                  {owner.phone && (
+                    <a
+                      href={`tel:${owner.phone}`}
+                      className="inline-flex items-center gap-2 rounded-full border border-caramel/30 bg-caramel/5 px-4 py-2 text-sm font-medium text-foreground hover:bg-caramel/10 transition-colors"
+                    >
+                      <Phone className="h-4 w-4 text-caramel" />
+                      {owner.phone}
+                    </a>
+                  )}
+                  {owner.email && (
+                    <a
+                      href={`mailto:${owner.email}`}
+                      className="inline-flex items-center gap-2 rounded-full border border-caramel/30 bg-caramel/5 px-4 py-2 text-sm font-medium text-foreground hover:bg-caramel/10 transition-colors"
+                    >
+                      <Mail className="h-4 w-4 text-caramel" />
+                      {owner.email}
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </Reveal>
+
+      {/* ── CTA Section ── */}
       <Reveal className="mt-16">
         <div className="rounded-[2rem] bg-secondary/70 p-8 text-center sm:p-14">
           <h2 className="font-display text-2xl font-bold sm:text-3xl">

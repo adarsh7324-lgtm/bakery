@@ -10,6 +10,7 @@ import {
   User,
   Settings,
   MessageSquare,
+  Images,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import logoUrl from "@/assets/logo.jpg";
@@ -38,6 +39,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/admin/products", label: "Products", icon: Package },
     { to: "/admin/products/new", label: "Add Product", icon: PlusCircle },
+    { to: "/admin/gallery", label: "Edit Gallery", icon: Images },
     { to: "/admin/faqs", label: "Chat Assistant", icon: MessageSquare },
     { to: "/admin/settings", label: "Settings", icon: Settings },
   ];
