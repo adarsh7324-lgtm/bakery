@@ -1,33 +1,38 @@
 /**
  * Supabase Client
  *
- * Replace the placeholder values below with your actual Supabase
- * Project URL and Anon (public) Key before use.
- *
- * These come from: Supabase Dashboard → Your Project → Settings → API
+ * VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set in:
+ *   - Local dev: .env file
+ *   - Vercel: Project Settings → Environment Variables
  */
 
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
 // ─── Credentials ─────────────────────────────────────────────────────────────
-// TODO: Replace with your real values or load from env vars
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  throw new Error(
-    "[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. " +
-    "Add them to your .env file."
+  console.warn(
+    "[Supabase] VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY is not set. " +
+    "Add them to your .env file locally and to Environment Variables on Vercel."
   );
 }
 
 // ─── Client ──────────────────────────────────────────────────────────────────
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-});
+// Fall back to placeholder values so the module loads without crashing.
+// API calls will fail gracefully until real credentials are provided.
+export const supabase = createClient<Database>(
+  SUPABASE_URL || "https://placeholder.supabase.co",
+  SUPABASE_ANON_KEY || "placeholder-key",
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  }
+);
 
 export default supabase;
+
