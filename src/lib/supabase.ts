@@ -10,8 +10,8 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
 // ─── Credentials ─────────────────────────────────────────────────────────────
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = import.meta.env['VITE_SUPABASE_URL'] as string;
+const SUPABASE_ANON_KEY = import.meta.env['VITE_SUPABASE_ANON_KEY'] as string;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.warn(
@@ -23,7 +23,7 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 // ─── Client ──────────────────────────────────────────────────────────────────
 // Fall back to placeholder values so the module loads without crashing.
 // API calls will fail gracefully until real credentials are provided.
-export const supabase = createClient<Database>(
+export const supabase = createClient<any>(
   SUPABASE_URL || "https://placeholder.supabase.co",
   SUPABASE_ANON_KEY || "placeholder-key",
   {

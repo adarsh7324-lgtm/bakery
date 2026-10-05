@@ -31,7 +31,7 @@ export type CreateFAQInput = Omit<FAQ, "id" | "createdAt" | "updatedAt">;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function rowToFAQ(row: Record<string, unknown>): FAQ {
+function rowToFAQ(row: any): FAQ {
   return {
     id: row.id as string,
     question: row.question as string,
@@ -193,6 +193,7 @@ export const faqService = {
 
     const a = all[idx];
     const b = all[swapIdx];
+    if (!a || !b) return;
     await Promise.all([
       supabase.from("faqs").update({ order: b.order }).eq("id", a.id),
       supabase.from("faqs").update({ order: a.order }).eq("id", b.id),

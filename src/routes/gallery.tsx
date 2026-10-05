@@ -51,7 +51,7 @@ const tags = ["All", "Cakes", "Pastries", "Pizza", "Bakery", "Store Interior"];
 
 function Gallery() {
   const [tag, setTag] = useState("All");
-  const customPhotos = useGalleryPhotos();
+  const { photos: customPhotos } = useGalleryPhotos();
 
   // Merge: custom photos shown first, then static ones
   const allPhotos = customPhotos.length > 0

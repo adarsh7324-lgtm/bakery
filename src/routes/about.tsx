@@ -34,7 +34,7 @@ const timeline = [
 ];
 
 function About() {
-  const owner = useOwnerDetails();
+  const { owner } = useOwnerDetails();
 
   // Use the bundled owner image as fallback if no custom photo is set
   const ownerPhoto = owner.photo || ownerImgSrc;

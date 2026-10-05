@@ -16,8 +16,8 @@ export type CreateProductInput = Omit<MenuItem, "id"> & { id?: string };
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Convert a Supabase DB row → app MenuItem */
-function rowToItem(row: Record<string, unknown>): MenuItem {
-  return {
+function rowToItem(row: any): MenuItem {
+  const item: MenuItem = {
     id: row.id as string,
     name: row.name as string,
     description: row.description as string,
@@ -25,10 +25,13 @@ function rowToItem(row: Record<string, unknown>): MenuItem {
     category: row.category as string,
     image: row.image as string,
     popular: row.popular as number,
-    badge: (row.badge as MenuItem["badge"]) ?? undefined,
     available: row.available as boolean,
     featured: row.featured as boolean,
   };
+  if (row.badge) {
+    item.badge = row.badge as any;
+  }
+  return item;
 }
 
 /** Convert MenuItem → Supabase insert/update shape */

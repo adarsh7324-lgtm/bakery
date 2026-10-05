@@ -38,7 +38,7 @@ const defaultOwner: OwnerDetails = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function rowToPhoto(row: Record<string, unknown>): GalleryPhoto {
+function rowToPhoto(row: any): GalleryPhoto {
   return {
     id: row.id as string,
     src: row.src as string,
@@ -47,7 +47,7 @@ function rowToPhoto(row: Record<string, unknown>): GalleryPhoto {
   };
 }
 
-function rowToOwner(row: Record<string, unknown>): OwnerDetails {
+function rowToOwner(row: any): OwnerDetails {
   return {
     name: (row.name as string) || defaultOwner.name,
     title: (row.title as string) || defaultOwner.title,
@@ -179,7 +179,7 @@ export const galleryService = {
       .eq("singleton_id", true)
       .single();
     if (error || !data) return defaultOwner;
-    return rowToOwner(data as Record<string, unknown>);
+    return rowToOwner(data as any);
   },
 
   async updateOwner(updates: Partial<OwnerDetails>): Promise<OwnerDetails> {
@@ -197,7 +197,7 @@ export const galleryService = {
       .select()
       .single();
     if (error) throw error;
-    const owner = rowToOwner(data as Record<string, unknown>);
+    const owner = rowToOwner(data as any);
     notifyOwner(owner);
     return owner;
   },

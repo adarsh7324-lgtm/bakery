@@ -57,9 +57,9 @@ function AddProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return toast.error("Product name is required.");
-    if (!price || isNaN(Number(price))) return toast.error("Please enter a valid price.");
-    if (!description.trim()) return toast.error("Description is required.");
+    if (!name.trim()) { toast.error("Product name is required."); return; }
+    if (!price || isNaN(Number(price))) { toast.error("Please enter a valid price."); return; }
+    if (!description.trim()) { toast.error("Description is required."); return; }
 
     setIsSubmitting(true);
     try {
