@@ -13,7 +13,7 @@ import {
   Images,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
-import logoUrl from "@/assets/logo.jpg";
+import logoUrl from "@/assets/logo.png";
 import { authService } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
