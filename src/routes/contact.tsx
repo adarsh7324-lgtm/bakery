@@ -51,8 +51,13 @@ function Contact() {
             {[
               {
                 icon: MapPin,
-                title: "Address",
+                title: "Store 1",
                 lines: ["7X7J+CJ4 Hyderabad Gate,", "Banaras Hindu University,", "Varanasi, Uttar Pradesh, India"],
+              },
+              {
+                icon: MapPin,
+                title: "Store 2",
+                lines: ["Lahartara bridge, Golghar,", "Bazardiha, Maheshpur,", "Varanasi, Uttar Pradesh 221002"],
               },
               { icon: Phone, title: "Phone", lines: ["+91 7618000036", "+91 7007088230"] },
               { icon: Clock, title: "Open", lines: ["10:30 AM – 10:00 PM"] },
