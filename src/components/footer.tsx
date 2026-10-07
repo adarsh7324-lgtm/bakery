@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, MessageCircle, Clock, MapPin, Phone } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import logoUrl from "@/assets/logo.jpg";
+import logoUrl from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -56,7 +56,7 @@ export function Footer() {
           <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
             <li className="flex gap-2">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-caramel" />
-              926/2 Hyderabad Gate, Lanka, Varanasi
+              7X7J+CJ4 Hyderabad Gate, Banaras Hindu University, Varanasi, Uttar Pradesh, India
             </li>
             <li className="flex gap-2">
               <Phone className="mt-0.5 h-4 w-4 shrink-0 text-caramel" />
@@ -124,7 +124,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-border/70 px-4 py-6 text-center text-xs text-muted-foreground flex flex-col sm:flex-row items-center justify-between gap-3 max-w-7xl mx-auto">
-        <div>© {new Date().getFullYear()} Shree Bakers, Lanka, Varanasi. All rights reserved.</div>
+        <div>© {new Date().getFullYear()} Shree Bakers, Hyderabad Gate, Varanasi. All rights reserved.</div>
         <Link
           to="/admin/login"
           className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground/60 hover:text-caramel transition-colors"

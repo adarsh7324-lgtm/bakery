@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { motion, useScroll, useSpring } from "motion/react";
 import { Menu, Moon, ShoppingBag, Sun, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import logoUrl from "@/assets/logo.jpg";
+import logoUrl from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { useCart, useCartTotals } from "@/lib/store";
 
@@ -43,7 +43,7 @@ export function Navbar() {
                 Shree Bakers
               </span>
               <span className="block truncate text-[11px] uppercase tracking-[0.22em] text-caramel">
-                Lanka, Varanasi
+                Hyderabad Gate, Varanasi
               </span>
             </span>
           </Link>

@@ -11,13 +11,13 @@ import { Reveal, SectionHeading } from "@/components/reveal";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact Shree Bakers | Lanka, Varanasi Bakery" },
+      { title: "Contact Shree Bakers | Hyderabad Gate, Varanasi Bakery" },
       {
         name: "description",
         content:
-          "Visit Shree Bakers at 926/2 Hyderabad Gate, Lanka, Varanasi. Call +91 7618000036, open 10:30 AM to 10:00 PM daily.",
+          "Visit Shree Bakers at 7X7J+CJ4 Hyderabad Gate, Banaras Hindu University, Varanasi. Call +91 7618000036 or +91 7007088230, open 10:30 AM to 10:00 PM daily.",
       },
-      { property: "og:title", content: "Contact Shree Bakers, Lanka Varanasi" },
+      { property: "og:title", content: "Contact Shree Bakers, Hyderabad Gate, Varanasi" },
       {
         property: "og:description",
         content: "Address, phone, hours and enquiry form for Shree Bakers in Varanasi.",
@@ -52,9 +52,9 @@ function Contact() {
               {
                 icon: MapPin,
                 title: "Address",
-                lines: ["926/2 Hyderabad Gate,", "Lanka,", "Varanasi"],
+                lines: ["7X7J+CJ4 Hyderabad Gate,", "Banaras Hindu University,", "Varanasi, Uttar Pradesh, India"],
               },
-              { icon: Phone, title: "Phone", lines: ["+91 7618000036"] },
+              { icon: Phone, title: "Phone", lines: ["+91 7618000036", "+91 7007088230"] },
               { icon: Clock, title: "Open", lines: ["10:30 AM – 10:00 PM"] },
             ].map((c) => (
               <div
