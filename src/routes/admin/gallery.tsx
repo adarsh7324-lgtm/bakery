@@ -9,7 +9,7 @@ import {
   GripVertical,
   X,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import {
@@ -111,34 +111,37 @@ function AdminGalleryPage() {
 
   // ── Owner form state ──
   const [ownerForm, setOwnerForm] = useState({
-    name: owner.name,
-    title: owner.title,
-    bio: owner.bio,
-    phone: owner.phone ?? "",
-    email: owner.email ?? "",
-    photo: owner.photo,
+    name: "",
+    title: "",
+    bio: "",
+    phone: "",
+    email: "",
+    photo: "",
   });
-  const [ownerPhotoPreview, setOwnerPhotoPreview] = useState(owner.photo);
+  const [ownerPhotoPreview, setOwnerPhotoPreview] = useState("");
   const ownerPhotoRef = useRef<HTMLInputElement>(null);
   const [ownerSaving, setOwnerSaving] = useState(false);
+  const [formInitialized, setFormInitialized] = useState(false);
 
   // ── Gallery upload state ──
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
-  // Keep form in sync when owner data changes externally
-  const syncedName = owner.name;
-  if (ownerForm.name !== syncedName && !ownerSaving) {
-    setOwnerForm({
-      name: owner.name,
-      title: owner.title,
-      bio: owner.bio,
-      phone: owner.phone ?? "",
-      email: owner.email ?? "",
-      photo: owner.photo,
-    });
-    setOwnerPhotoPreview(owner.photo);
-  }
+  // Initialize form once owner data is loaded from Supabase
+  useEffect(() => {
+    if (!ownerLoading && !formInitialized) {
+      setOwnerForm({
+        name: owner.name ?? "",
+        title: owner.title ?? "",
+        bio: owner.bio ?? "",
+        phone: owner.phone ?? "",
+        email: owner.email ?? "",
+        photo: owner.photo ?? "",
+      });
+      setOwnerPhotoPreview(owner.photo ?? "");
+      setFormInitialized(true);
+    }
+  }, [owner, ownerLoading, formInitialized]);
 
   // ── Owner handlers ──
   const handleOwnerPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,10 +163,27 @@ function AdminGalleryPage() {
       if (formWithFile._photoFile) {
         photoUrl = await galleryService.uploadOwnerPhoto(formWithFile._photoFile);
       }
-      await galleryService.updateOwner({ ...ownerForm, photo: photoUrl });
+      const updated = await galleryService.updateOwner({
+        name: ownerForm.name,
+        title: ownerForm.title,
+        bio: ownerForm.bio,
+        phone: ownerForm.phone,
+        email: ownerForm.email,
+        photo: photoUrl,
+      });
+      setOwnerForm({
+        name: updated.name ?? "",
+        title: updated.title ?? "",
+        bio: updated.bio ?? "",
+        phone: updated.phone ?? "",
+        email: updated.email ?? "",
+        photo: updated.photo ?? "",
+      });
+      setOwnerPhotoPreview(updated.photo ?? "");
       toast.success("Owner details saved successfully!");
-    } catch {
-      toast.error("Failed to save owner details");
+    } catch (err: any) {
+      console.error("Failed to save owner details:", err);
+      toast.error(err?.message || "Failed to save owner details");
     } finally {
       setOwnerSaving(false);
     }
@@ -292,9 +312,8 @@ function AdminGalleryPage() {
                 <Input
                   value={ownerForm.name}
                   onChange={(e) => setOwnerForm((p) => ({ ...p, name: e.target.value }))}
-                  placeholder="e.g. Adarsh Rai"
+                  placeholder="e.g. Chef / Owner Name"
                   className="rounded-2xl"
-                  required
                 />
               </div>
               <div className="space-y-1.5">

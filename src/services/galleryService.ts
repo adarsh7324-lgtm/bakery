@@ -28,9 +28,9 @@ export interface OwnerDetails {
 // ─── Defaults ────────────────────────────────────────────────────────────────
 
 const defaultOwner: OwnerDetails = {
-  name: "Adarsh Rai",
+  name: "",
   title: "Founder & Head Baker",
-  bio: "With a deep passion for baking and an eye for detail, Adarsh founded Shree Bakers with a simple mission — bring fresh, handcrafted bakes to every table in Varanasi. From humble beginnings in a small kitchen to serving hundreds of happy customers daily, every product is made with love and quality ingredients.",
+  bio: "With a deep passion for baking and an eye for detail, Shree Bakers was founded with a simple mission — bring fresh, handcrafted bakes to every table in Varanasi. From humble beginnings in a small kitchen to serving hundreds of happy customers daily, every product is made with love and quality ingredients.",
   photo: "",
   phone: "",
   email: "",
@@ -49,12 +49,12 @@ function rowToPhoto(row: any): GalleryPhoto {
 
 function rowToOwner(row: any): OwnerDetails {
   return {
-    name: (row.name as string) || defaultOwner.name,
-    title: (row.title as string) || defaultOwner.title,
-    bio: (row.bio as string) || defaultOwner.bio,
-    photo: (row.photo as string) || "",
-    phone: (row.phone as string) || "",
-    email: (row.email as string) || "",
+    name: (row.name as string) ?? "",
+    title: (row.title as string) ?? defaultOwner.title,
+    bio: (row.bio as string) ?? defaultOwner.bio,
+    photo: (row.photo as string) ?? "",
+    phone: (row.phone as string) ?? "",
+    email: (row.email as string) ?? "",
   };
 }
 
@@ -173,30 +173,40 @@ export const galleryService = {
   },
 
   async getOwner(): Promise<OwnerDetails> {
-    const { data, error } = await supabase
-      .from("owner_details")
-      .select("*")
-      .eq("singleton_id", true)
-      .single();
-    if (error || !data) return defaultOwner;
-    return rowToOwner(data as any);
+    try {
+      const { data, error } = await supabase
+        .from("owner_details")
+        .select("*")
+        .eq("singleton_id", true)
+        .maybeSingle();
+      if (error || !data) return defaultOwner;
+      return rowToOwner(data as any);
+    } catch {
+      return defaultOwner;
+    }
   },
 
   async updateOwner(updates: Partial<OwnerDetails>): Promise<OwnerDetails> {
+    const payload: Record<string, any> = {
+      singleton_id: true,
+      updated_at: new Date().toISOString(),
+    };
+    if (updates.name !== undefined) payload.name = updates.name;
+    if (updates.title !== undefined) payload.title = updates.title;
+    if (updates.bio !== undefined) payload.bio = updates.bio;
+    if (updates.photo !== undefined) payload.photo = updates.photo;
+    if (updates.phone !== undefined) payload.phone = updates.phone;
+    if (updates.email !== undefined) payload.email = updates.email;
+
     const { data, error } = await supabase
       .from("owner_details")
-      .update({
-        ...(updates.name !== undefined && { name: updates.name }),
-        ...(updates.title !== undefined && { title: updates.title }),
-        ...(updates.bio !== undefined && { bio: updates.bio }),
-        ...(updates.photo !== undefined && { photo: updates.photo }),
-        ...(updates.phone !== undefined && { phone: updates.phone }),
-        ...(updates.email !== undefined && { email: updates.email }),
-      })
-      .eq("singleton_id", true)
+      .upsert(payload, { onConflict: "singleton_id" })
       .select()
       .single();
-    if (error) throw error;
+    if (error) {
+      console.error("galleryService.updateOwner failed:", error);
+      throw error;
+    }
     const owner = rowToOwner(data as any);
     notifyOwner(owner);
     return owner;
@@ -205,11 +215,14 @@ export const galleryService = {
   /** Upload owner photo to Supabase Storage and return its public URL */
   async uploadOwnerPhoto(file: File): Promise<string> {
     const ext = file.name.split(".").pop();
-    const path = `owner.${ext}`;
+    const path = `owner-${Date.now()}.${ext}`;
     const { error } = await supabase.storage
       .from("owner-photo")
       .upload(path, file, { upsert: true });
-    if (error) throw error;
+    if (error) {
+      console.error("galleryService.uploadOwnerPhoto failed:", error);
+      throw error;
+    }
     const { data } = supabase.storage.from("owner-photo").getPublicUrl(path);
     // Cache-bust so UI refreshes immediately
     return `${data.publicUrl}?t=${Date.now()}`;
